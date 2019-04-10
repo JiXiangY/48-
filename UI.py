@@ -10,6 +10,7 @@ from tkinter import ttk
 from infoData import InfoData
 import os,sys
 import downLoadVideo
+from ffmpy3 import FFmpeg
 
 window = tk.Tk()
 window.title('口袋房间数据')
@@ -189,25 +190,48 @@ next_button.place(x = 180, y = 130,height = 40,width = 100)
 def click_DownButton():
     #根据视频编号下载视频
      #手机号
-    video_number = down_entry.get()
-    if len(video_number) < 0:
-        downlistbox.insert(tk.END,"错误\n请选择正确编号")
+    video_number = int(down_entry.get())
+
+    if video_number < 0:
+        downlistbox.insert(tk.END, "错误\n请选择正确编号")
         return
     if video_number >= len(videoList):
-        downlistbox.insert(tk.END,"错误\n请选择正确编号")
+        downlistbox.insert(tk.END, "错误\n请选择正确编号")
         return
+        #获得.py所在的文件夹的绝对路径
+    dic = videoList[video_number]
+    url = dic['url']
+    if 'xiaoka.tv' in url:
+        downlistbox.insert(tk.END, 'xiaoka.tv 视频')
+    elif 'http://cychengyuan-vod.48.cn' in url:
+        url = url.replace('http://','https://')
+    else:
+        downlistbox.insert(tk.END, "url错误 下载失败")
+        return
+    name = dic['title'] + '_' + dic['time']
+    py_file_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = py_file_path+'/'+ name + '.mp4'
+    ff = FFmpeg(
+        inputs={
+            url: None},
+        outputs={file_path: '-c copy -bsf:a aac_adtstoasc'}
+        )
+    print(ff.cmd)
+    try:
+        ff.run_async()
+        downlistbox.insert(tk.END, "请等待下载完成")
+    except:
+        downlistbox.insert(tk.END, "ffmpeg错误\n下载失败")
     
 
 
 
-down_button = tk.Button(window,text = '下载',command = click_NextButton,bg = "blue",font = 20) 
+down_button = tk.Button(window,text = '下载',command = click_DownButton,bg = "blue",font = 20) 
 down_button.place(x = 650, y = 0,height = 40,width = 100)
 
-# ff = ffmpy3.FFmpeg(
-#     inputs={'https://alcdn.hls.xiaoka.tv/201943/10d/c6c/x6kpSV2MZYg_w26S/index.m3u8 ': None},
-#     outputs={'output.avi': None}
-#     )
-# ff.run()
+
+    
+
 
 window.mainloop()                 # 进入消息循环
 

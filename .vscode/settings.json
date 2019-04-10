@@ -1,0 +1,9 @@
+{
+    "python.unitTest.pyTestArgs": [
+        "ffmpeg-20190407-8607e29-win64-static"
+    ],
+    "python.unitTest.unittestEnabled": false,
+    "python.unitTest.nosetestsEnabled": false,
+    "python.unitTest.pyTestEnabled": true,
+    "python.pythonPath": "/usr/local/bin/python3"
+}
